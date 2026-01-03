@@ -1,12 +1,16 @@
 cls
-Write-Host "Installing..."
+Write-Host "IdAproshop https://discord.gg/RNqYpC7x7Q"
 
-# ===== PROGRESS 1/10000 =====
-for ($i = 1; $i -le 10000; $i++) {
-    Write-Progress -Activity "Installing Tweaks" -Status "$i / 10000" -PercentComplete (($i/10000)*100)
+for ($i = 1; $i -le 3192; $i++) {
+    Write-Progress `
+        -Activity "Installing Tweaks" `
+        -Status "$i / 3192" `
+        -PercentComplete (($i / 3192) * 100)
+
     Start-Sleep -Milliseconds 1
 }
-Write-Progress -Activity "Installing Tweaks" -Completed
+
+Write-Progress -Activity "Installing wait..." -Completed
 
 # ===== XblGameSave DISABLE =====
 reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v DependOnService /t REG_MULTI_SZ /d "UserManager\0XblAuthManager" /f
