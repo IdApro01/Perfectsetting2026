@@ -1,5 +1,5 @@
 cls
-Write-Host "IdAproshop https://discord.gg/RNqYpC7x7Q"
+Write-Host "Welcome IdAprostore nocheating https://discord.gg/RNqYpC7x7Q"
 
 for ($i = 1; $i -le 2192; $i++) {
     Write-Progress `
