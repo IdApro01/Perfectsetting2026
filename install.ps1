@@ -1,6 +1,7 @@
 cls
 Write-Host "   Welcome to IdAprostore nocheating"
-Write-Host "Discord : https://discord.gg/RNqYpC7x7Q" -ForegroundColor Cyan
+Write-Host "Discord : " -NoNewline -ForegroundColor White
+Write-Host "https://discord.gg/RNqYpC7x7Q" -ForegroundColor Cyan
 
 for ($i = 1; $i -le 2192; $i++) {
     Write-Progress `
