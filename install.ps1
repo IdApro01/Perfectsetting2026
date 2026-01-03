@@ -1,11 +1,11 @@
 cls
 Write-Host "IdAproshop https://discord.gg/RNqYpC7x7Q"
 
-for ($i = 1; $i -le 3192; $i++) {
+for ($i = 1; $i -le 2192; $i++) {
     Write-Progress `
-        -Activity "Installing Tweaks" `
-        -Status "$i / 3192" `
-        -PercentComplete (($i / 3192) * 100)
+        -Activity "Installing wait..." `
+        -Status "$i / 2192" `
+        -PercentComplete (($i / 2192) * 100)
 
     Start-Sleep -Milliseconds 1
 }
