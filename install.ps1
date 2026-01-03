@@ -1,62 +1,42 @@
-# ================= ADMIN CHECK =================
-if (-not ([Security.Principal.WindowsPrincipal] `
-[Security.Principal.WindowsIdentity]::GetCurrent()
-).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "PLEASE RUN AS ADMIN" -ForegroundColor Red
-    pause
-    exit
-}
-
 cls
-Write-Host "INSTALLING PERFECT2026..." -ForegroundColor Red
+Write-Host "Installing..."
 
-# ================= POWER PLAN =================
-powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 | Out-Null
-powercfg -setactive e9a42b02-d5df-448d-aa00-03f14749eb61
-powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMIN 100
-powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMAX 100
-powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR IDLEDISABLE 1
-powercfg -setactive SCHEME_CURRENT
+# ===== PROGRESS 1/10000 =====
+for ($i = 1; $i -le 10000; $i++) {
+    Write-Progress -Activity "Installing Tweaks" -Status "$i / 10000" -PercentComplete (($i/10000)*100)
+    Start-Sleep -Milliseconds 1
+}
+Write-Progress -Activity "Installing Tweaks" -Completed
 
-# ================= CPU / TIMER =================
-bcdedit /set disabledynamictick yes | Out-Null
-bcdedit /set useplatformtick yes | Out-Null
-bcdedit /set useplatformclock true | Out-Null
-bcdedit /set tscsyncpolicy Enhanced | Out-Null
-bcdedit /set hypervisorlaunchtype off | Out-Null
+# ===== XblGameSave DISABLE =====
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v DependOnService /t REG_MULTI_SZ /d "UserManager\0XblAuthManager" /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v Description /t REG_SZ /d "@%systemroot%\system32\XblGameSave.dll,-101" /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v DisplayName /t REG_SZ /d "@%systemroot%\system32\XblGameSave.dll,-100" /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v ErrorControl /t REG_DWORD /d 1 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v FailureActions /t REG_BINARY /d 80510100000000000000000004000000140000000100000010270000010000001027000001000000102700000000000000000000 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v ImagePath /t REG_EXPAND_SZ /d "%SystemRoot%\system32\svchost.exe -k netsvcs -p" /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v ObjectName /t REG_SZ /d LocalSystem /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v Start /t REG_DWORD /d 4 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v Type /t REG_DWORD /d 32 /f
 
-# ================= WIN32 PRIORITY =================
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v Win32PrioritySeparation /t REG_DWORD /d 38 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v ConvertibleSlateMode /t REG_DWORD /d 0 /f
+# ===== PARAMETERS =====
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\Parameters" /v ServiceDll /t REG_EXPAND_SZ /d "%SystemRoot%\System32\XblGameSave.dll" /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\Parameters" /v ServiceDllUnloadOnStop /t REG_DWORD /d 1 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\Parameters" /v ServiceIdleTimeout /t REG_DWORD /d 600 /f
 
-# ================= GPU / GAME SCHEDULER =================
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v SystemResponsiveness /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "GPU Priority" /t REG_DWORD /d 8 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v Priority /t REG_DWORD /d 6 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "Scheduling Category" /t REG_SZ /d High /f
+# ===== TRIGGER =====
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\TriggerInfo\0" /v Action /t REG_DWORD /d 1 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\TriggerInfo\0" /v Data0 /t REG_BINARY /d 460036004300390038003700300038002d0043003700420038002d0034003900310039002d0038003800370043002d003200430045003600360045003700380042003900410030000000 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\TriggerInfo\0" /v DataType0 /t REG_DWORD /d 2 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\TriggerInfo\0" /v GUID /t REG_BINARY /d 67d190bc70943941a9babe0bbbf5b74d /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\TriggerInfo\0" /v Type /t REG_DWORD /d 6 /f
 
-# ================= INPUT (RAW MOUSE) =================
-reg add "HKCU\Control Panel\Mouse" /v MouseSpeed /t REG_SZ /d 0 /f
-reg add "HKCU\Control Panel\Mouse" /v MouseThreshold1 /t REG_SZ /d 0 /f
-reg add "HKCU\Control Panel\Mouse" /v MouseThreshold2 /t REG_SZ /d 0 /f
+# ===== WIN32 PRIORITY =====
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v ConvertibleSlateMode /t REG_DWORD /d 0 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v Win32PrioritySeparation /t REG_BINARY /d 2800000000000000 /f
 
-# ================= GAME DVR / OVERLAY =================
-reg add "HKCU\System\GameConfigStore" /v GameDVR_Enabled /t REG_DWORD /d 0 /f
-reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /v AllowGameDVR /t REG_DWORD /d 0 /f
+# ===== FiveM HIGH PRIORITY =====
+reg.exe add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\FiveM_GTAProcess.exe\PerfOptions" /v CpuPriorityClass /t REG_DWORD /d 3 /f
 
-# ================= MEMORY =================
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v DisablePagingExecutive /t REG_DWORD /d 1 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v LargeSystemCache /t REG_DWORD /d 1 /f
-
-# ================= NETWORK (LOW LATENCY) =================
-netsh int tcp set global autotuninglevel=disabled
-netsh int tcp set global rss=enabled
-netsh int tcp set global ecncapability=disabled
-netsh int tcp set global timestamps=disabled
-
-# ================= XBOX / BACKGROUND =================
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v Start /t REG_DWORD /d 4 /f
-
-Write-Host ""
-Write-Host "INSTALL COMPLETE - RESTART NOW" -ForegroundColor Green
+Write-Host "Install Complete"
 pause
