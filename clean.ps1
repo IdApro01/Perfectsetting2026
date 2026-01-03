@@ -1,42 +1,30 @@
-# ================= ADMIN CHECK =================
-if (-not ([Security.Principal.WindowsPrincipal] `
-[Security.Principal.WindowsIdentity]::GetCurrent()
-).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "PLEASE RUN AS ADMIN" -ForegroundColor Red
-    pause
-    exit
-}
-
 cls
-Write-Host "RESTORING WINDOWS DEFAULT..." -ForegroundColor Yellow
+Write-Host "Cleaning / Restoring..."
 
-# ================= POWER PLAN =================
-powercfg -setactive SCHEME_BALANCED
+# ===== PROGRESS 1/3000 =====
+for ($i = 1; $i -le 3000; $i++) {
+    Write-Progress -Activity "Cleaning Tweaks" -Status "$i / 3000" -PercentComplete (($i/3000)*100)
+    Start-Sleep -Milliseconds 1
+}
+Write-Progress -Activity "Cleaning Tweaks" -Completed
 
-# ================= CPU / TIMER RESET =================
-bcdedit /deletevalue disabledynamictick | Out-Null
-bcdedit /deletevalue useplatformtick | Out-Null
-bcdedit /deletevalue useplatformclock | Out-Null
-bcdedit /deletevalue tscsyncpolicy | Out-Null
-bcdedit /set hypervisorlaunchtype auto | Out-Null
+# ===== RESTORE XblGameSave =====
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v Start /t REG_DWORD /d 3 /f
+reg.exe delete "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave\TriggerInfo\0" /f
 
-# ================= WIN32 RESET =================
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v Win32PrioritySeparation /t REG_DWORD /d 2 /f
+# ===== RESTORE PRIORITY =====
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v ConvertibleSlateMode /t REG_DWORD /d 1 /f
+reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v Win32PrioritySeparation /t REG_BINARY /d 2600000000000000 /f
 
-# ================= GPU RESET =================
-reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v SystemResponsiveness /t REG_DWORD /d 20 /f
+# ===== REMOVE FiveM PRIORITY =====
+reg.exe delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\FiveM_GTAProcess.exe" /f
 
-# ================= INPUT RESET =================
-reg add "HKCU\Control Panel\Mouse" /v MouseSpeed /t REG_SZ /d 1 /f
-reg add "HKCU\Control Panel\Mouse" /v MouseThreshold1 /t REG_SZ /d 6 /f
-reg add "HKCU\Control Panel\Mouse" /v MouseThreshold2 /t REG_SZ /d 10 /f
+# ===== CLEAR POWERSHELL HISTORY =====
+Clear-History
+Remove-Item "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
 
-# ================= GAME DVR =================
-reg add "HKCU\System\GameConfigStore" /v GameDVR_Enabled /t REG_DWORD /d 1 /f
+# ===== CLEAR RUN HISTORY =====
+reg.exe delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" /f
 
-# ================= XBOX =================
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v Start /t REG_DWORD /d 3 /f
-
-Write-Host ""
-Write-Host "CLEAN COMPLETE - RESTART NOW" -ForegroundColor Green
+Write-Host "Clean Complete"
 pause
