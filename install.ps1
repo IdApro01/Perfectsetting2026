@@ -1,8 +1,8 @@
 cls
-Write-Host "   INSTALLING Wait"
+Write-Host "installing Wait..."
 for ($i = 1; $i -le 2192; $i++) {
     Write-Progress `
-        -Activity "กําลังติดตั้ง โปรดรอสักครู่..." `
+        -Activity "Setup Realtime" `
         -Status "$i / 2192" `
         -PercentComplete (($i / 2192) * 100)
 
