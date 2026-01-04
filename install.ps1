@@ -1,11 +1,8 @@
 cls
-Write-Host "   Welcome to IdAprostore nocheating"
-Write-Host "Discord : " -NoNewline -ForegroundColor White
-Write-Host "https://discord.gg/RNqYpC7x7Q" -ForegroundColor Cyan
-
+Write-Host "   INSTALLING Wait"
 for ($i = 1; $i -le 2192; $i++) {
     Write-Progress `
-        -Activity "Installing wait..." `
+        -Activity "กําลังติดตั้ง โปรดรอสักครู่..." `
         -Status "$i / 2192" `
         -PercentComplete (($i / 2192) * 100)
 
